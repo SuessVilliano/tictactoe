@@ -20,11 +20,11 @@ h1 {
     text-shadow: 0 0 10px #00ffc3;
 }
 
-.game-mode {
+.game-mode, .difficulty-levels {
     margin-bottom: 20px;
 }
 
-.game-mode button {
+.game-mode button, .difficulty-levels button {
     padding: 10px 20px;
     font-size: 1.5em;
     cursor: pointer;
@@ -35,7 +35,7 @@ h1 {
     transition: background-color 0.3s;
 }
 
-.game-mode button:hover {
+.game-mode button:hover, .difficulty-levels button:hover {
     background-color: #00bfa6;
 }
 
@@ -128,4 +128,30 @@ h1 {
 .scoreboard span {
     margin: 0 10px;
     color: #00ffc3;
+}
+
+.blink {
+    animation: blink-animation 1s infinite;
+}
+
+@keyframes blink-animation {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@media (max-width: 600px) {
+    .game-board {
+        grid-template-columns: repeat(3, 80px);
+        grid-template-rows: repeat(3, 80px);
+    }
+
+    .cell {
+        width: 80px;
+        height: 80px;
+    }
+
+    .cell.x::before, .cell.o::before {
+        font-size: 2.5em;
+    }
 }
