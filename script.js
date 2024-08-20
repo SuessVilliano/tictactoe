@@ -18,18 +18,19 @@ let oTurn;
 let playerXScore = 0;
 let playerOScore = 0;
 let isAI = false;
+let difficulty = 'medium';
 
 const aiButton = document.getElementById('aiButton');
 const twoPlayerButton = document.getElementById('twoPlayerButton');
 const gameModeDiv = document.getElementById('game-mode');
 const gameDiv = document.getElementById('game');
+const difficultyLevelsDiv = document.getElementById('difficulty-levels');
 
 // Add event listeners to the buttons
 aiButton.addEventListener('click', () => {
     isAI = true;
-    startGame();
     gameModeDiv.classList.add('hidden');
-    gameDiv.classList.remove('hidden');
+    difficultyLevelsDiv.classList.remove('hidden');
 });
 
 twoPlayerButton.addEventListener('click', () => {
@@ -39,20 +40,56 @@ twoPlayerButton.addEventListener('click', () => {
     gameDiv.classList.remove('hidden');
 });
 
+document.getElementById('easyButton').addEventListener('click', () => {
+    difficulty = 'easy';
+    startGame();
+    difficultyLevelsDiv.classList.add('hidden');
+    gameDiv.classList.remove('hidden');
+});
+
+document.getElementById('mediumButton').addEventListener('click', () => {
+    difficulty = 'medium';
+    startGame();
+    difficultyLevelsDiv.classList.add('hidden');
+    gameDiv.classList.remove('hidden');
+});
+
+document.getElementById('hardButton').addEventListener('click', () => {
+    difficulty = 'hard';
+    startGame();
+    difficultyLevelsDiv.classList.add('hidden');
+    gameDiv.classList.remove('hidden');
+});
+
 // Event listener for restarting the game
 restartButton.addEventListener('click', startGame);
 
 function startGame() {
-    oTurn = false;
+    // Randomly select the starting player unless a player has won
+    if (playerXScore === 0 && playerOScore === 0) {
+        oTurn = Math.random() < 0.5;
+    }
+
     cells.forEach(cell => {
         cell.classList.remove(X_CLASS);
         cell.classList.remove(O_CLASS);
-        cell.setAttribute('data-symbol', ''); // Reset symbol display
+        cell.setAttribute('data-symbol', ''); 
         cell.removeEventListener('click', handleClick);
         cell.addEventListener('click', handleClick, { once: true });
     });
     setBoardHoverClass();
     winningMessageElement.style.display = 'none';
+    blinkSymbol();
+}
+
+function blinkSymbol() {
+    const currentClass = oTurn ? O_CLASS : X_CLASS;
+    const gameBoard = document.querySelector('.game-board');
+    gameBoard.classList.add('blink');
+    gameBoard.classList.add(currentClass);
+    setTimeout(() => {
+        gameBoard.classList.remove('blink');
+    }, 1000);
 }
 
 function handleClick(e) {
@@ -75,10 +112,19 @@ function handleClick(e) {
 }
 
 function makeAIMove() {
-    const availableCells = [...cells].filter(cell => 
+    let availableCells = [...cells].filter(cell => 
         !cell.classList.contains(X_CLASS) && !cell.classList.contains(O_CLASS)
     );
-    const randomCell = availableCells[Math.floor(Math.random() * availableCells.length)];
+
+    let randomCell;
+    if (difficulty === 'easy') {
+        randomCell = availableCells[Math.floor(Math.random() * availableCells.length)];
+    } else if (difficulty === 'medium') {
+        randomCell = calculateBestMove(availableCells);
+    } else if (difficulty === 'hard') {
+        randomCell = calculateOptimalMove(availableCells);
+    }
+
     placeMark(randomCell, O_CLASS, 'O');
     if (checkWin(O_CLASS)) {
         endGame(false);
@@ -89,6 +135,16 @@ function makeAIMove() {
         swapTurns();
         setBoardHoverClass();
     }
+}
+
+function calculateBestMove(availableCells) {
+    // Implement logic for a balanced AI move
+    return availableCells[Math.floor(Math.random() * availableCells.length)];
+}
+
+function calculateOptimalMove(availableCells) {
+    // Implement logic for the best possible AI move
+    return availableCells[Math.floor(Math.random() * availableCells.length)];
 }
 
 function endGame(draw) {
